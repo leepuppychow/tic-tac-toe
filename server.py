@@ -4,19 +4,17 @@ from uuid import UUID, uuid4
 
 from fastmcp import FastMCP
 
-from game_ai import StrategicAI
-from game_engine import StandardGameEngine
 from models import Game, GameStatus, Move, Player, PlayerType, Piece
-from storage import InMemoryGameStorage
+
+from config import ConfigService
 
 mcp = FastMCP("Tic-Tac-Toe MCP Server")
 
-
-# TODO: create a config service / mappings to use here
-# Initialize services
-storage = InMemoryGameStorage()
-engine = StandardGameEngine()
-ai = StrategicAI(engine)
+# Initialize services via config service
+config = ConfigService()
+storage = config.get_storage()
+engine = config.get_engine()
+ai = config.get_ai()
 
 
 @mcp.tool
@@ -87,13 +85,12 @@ def display_board(game_uuid: str) -> str:
 
 
 @mcp.tool
-def get_next_move(game_uuid: str, player_uuid: str, ai_type: str = "strategic") -> dict:
+def get_next_move(game_uuid: str, player_uuid: str) -> dict:
     """Get the next move for a player using AI.
 
     Args:
         game_uuid: The UUID of the game.
         player_uuid: The UUID of the player making the move.
-        ai_type: Type of AI to use ("strategic" or "random"). Defaults to "strategic".
 
     Returns:
         Dictionary containing the suggested position.
@@ -102,18 +99,8 @@ def get_next_move(game_uuid: str, player_uuid: str, ai_type: str = "strategic") 
     if not game:
         return {"error": f"Game {game_uuid} not found"}
 
-    # Select AI based on type
-    # TODO: feels like the AI implementation should be chosen at the start of the MCP server
-    # or maybe in the create_game tool (refactor later)
-    if ai_type.lower() == "random":
-        from game_ai import RandomSelection
-
-        selected_ai = RandomSelection(engine)
-    else:
-        selected_ai = ai
-
     try:
-        position = selected_ai.get_next_move(game, UUID(player_uuid))
+        position = ai.get_next_move(game, UUID(player_uuid))
         return {
             "game_uuid": game_uuid,
             "player_uuid": player_uuid,
