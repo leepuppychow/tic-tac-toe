@@ -2,8 +2,6 @@
 
 A Model Context Protocol (MCP) server for playing tic-tac-toe games. This server provides tools for creating games, making moves, displaying boards, and managing game state through AI assistants like Cursor.
 
-* [Link to ~2 hour screen capture](https://drive.google.com/file/d/1gnKyjaTpD5BpKEnMT8pk5fAgfZZbWpCI/view?usp=sharing)
-
 ## Features
 
 - 🎮 Create and manage tic-tac-toe games
